@@ -12,3 +12,5 @@
 1장. 리스트, 스택 큐
 * 실습문제1 / 책에서는 doubly_linked_list로 구현하고 있음.
   * 본인은 singly로 구현하는 작업중.
+  * pop_back 부분 수정필요
+    * dummy 활용해서 구현 중

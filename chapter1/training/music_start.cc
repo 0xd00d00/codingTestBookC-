@@ -7,6 +7,7 @@
 //
 // singly_node로 할거면 tail필요. 안하면 너무 순회를 많이 해야됨.
 
+#include <cstddef>
 #include <iostream>
 #include <string>
 
@@ -29,40 +30,79 @@ public:
 
 private:
   // 초기화 하지 않은 bus error남.
-  node_ptr head = tail = nullptr;
+  node_ptr head = nullptr;
+  node_ptr tail = nullptr;
 public:
-
   // 2. node를 삽입하고 삭제할 수 있어야함.
   // 지금은 일자로 삽입한거임 -> 원형으로 삽입하도록 만들어야지
   // 난 싱그리로 구현한다.
   //
   // 그림 그려가면서 코딩해야함.
   // 그게 가장 빠름.
+  // void push_back(std::string music_name) {
+  //   node_ptr tmp = new node{ music_name, nullptr };
+  //
+  //   if (head == nullptr) {
+  //     head = tmp;
+  //     tail = tmp;
+  //     tmp->next_ = head;
+  //     return;
+  //   }
+  //
+  //   // 최신을 가장 마지막에 유지
+  //   tmp->next_ = head->next_;
+  //   head->next_ = tmp;
+  // }
+
+
+  // dummy를 놔두고 넣어야함. 만약 할 거면
+
+  circular_linked_list() {
+    head = tail = new node { "", nullptr };
+    head->next_ = head;
+  }
+
   void push_back(std::string music_name) {
-    node_ptr tmp = new node{ music_name, nullptr };
+    node_ptr tmp = new node { music_name, nullptr };
+    tmp->next_ = head;
+    tail->next_ = tmp;
+    tail = tmp;
 
-    if (head == nullptr) {
-      head = tmp;
-      tail = tmp;
-      tmp->next_ = head;
-      return;
-    }
-
-    // 최신을 가장 마지막에 유지
-    tmp->next_ = head->next_;
-    head->next_ = tmp;
   }
 
   void pop_back() {
-
-    if (head == tail) {
-      head = tail = nullptr;
+    if (head->next_ == tail) {
+      // 끝난거임..
+      std::cout << "여기 ? ";
+      delete tail;
+      tail = nullptr;
+      delete head;
+      head = nullptr;
       return;
     }
 
-    auto tmp = tail;
-    tail = tmp->next_;
-    head_next_ = tail;
+    auto tmp = head->next_;
+    while ( true ) {
+      if (tmp->next_ == tail) {
+        tmp->next_ = head;
+        delete tail;
+        tail = tmp;
+        break;
+      }
+    }
+  }
+
+
+  // void pop_back() {
+  //
+  //   if (head == tail) {
+  //     head = tail = nullptr;
+  //     return;
+  //   }
+  //
+  //   auto tmp = tail;
+  //   tail = tmp->next_;
+  //   head_next_ = tail;
 
 
     /*
@@ -79,7 +119,7 @@ public:
 
     // tail 없으면 위 처럼 돌아야함.
     //
-  }
+   // }
 
 
   // error: use of non-static data member 'head' of 'circular_linked_list' from nested type 'circular_ll_iter' 
@@ -110,23 +150,20 @@ public:
 
       friend bool operator==(const circular_ll_iter& left,
           const circular_ll_iter& right) {
-        std::cout << "left.. right..";
         return left.ptr_ == right.ptr_;
       }
       friend bool operator!=(const circular_ll_iter& left,
           const circular_ll_iter& right) {
-        std::cout << "left..!= right..";
         return left.ptr_ != right.ptr_;
       }
   };
 
   // iterator 안에 있는거 아니다.
-  circular_ll_iter begin() { return circular_ll_iter(head); }
-
+  circular_ll_iter begin() { return circular_ll_iter(head->next_); }
   // end는 그전껄 가리켜야함.
-  circular_ll_iter end() { return circular_ll_iter(nullptr); }
+  circular_ll_iter end() { return circular_ll_iter(head); }
   circular_ll_iter begin() const { return circular_ll_iter(head); }
-  circular_ll_iter end() const { return circular_ll_iter(nullptr); }
+  circular_ll_iter end() const { return circular_ll_iter(tail); }
 
   // 반복자 활용
   void printall() {
@@ -150,7 +187,17 @@ int main() {
   test.push_back("kim");
   test.push_back("lee");
 
-  for(auto i : test) {
-    std::cout << i << " ";
-  }
+  test.pop_back();
+  test.pop_back();
+ // for (auto i : test)
+ //   std::cout << i << std::endl;
+  /*
+  test.printall();
+
+  test.pop_back();
+  test.printall();
+
+  test.pop_back();
+  test.printall();
+  */
 }
